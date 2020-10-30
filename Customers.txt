@@ -1,0 +1,5 @@
+Lars;Larsson;9209013451
+Stefan;Karlsson;8801091234
+Stefan;Test;1234121234
+Test;Testsson;0000000000
+test;testsson;1234567890
