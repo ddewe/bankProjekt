@@ -1,5 +1,8 @@
 package com.company;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.io.*;
 
@@ -13,6 +16,8 @@ public class Main {
         File customerFile = new File("Customers.txt");
         File transactionFile = new File("Transactions.txt");
         File accountFile = new File("Accounts.txt");
+
+
         ArrayList<customerClass> customerList = new ArrayList<>();
         ArrayList<transactionClass> transactionList = new ArrayList<>();
         ArrayList<accountClass> accountList = new ArrayList<>();
@@ -21,49 +26,28 @@ public class Main {
         String accountFormat = "%-8s %-15s %-10s\n";
         //endregion
 
-        //Kollar om filer finns, annars skapar.
-        createFiles(customerFile, transactionFile, accountFile);
+        //Creates files, reads from files to lists.
+        startOfProgram(customerFile, transactionFile, accountFile, customerList, transactionList, accountList);
 
-        //Skriver från listor till filer
-        filesToLists(customerFile, transactionFile, accountFile, customerList, transactionList, accountList);
+        //region Main loop
+        while (true) {
 
-        //Skriv ut meny med alternativ.
-        printMenu();
+            //Skriv ut meny med alternativ.
+            printMenu();
 
-        //Lista konton
-
-        //region Inmatningskontroll
-        String strVal = tangentbord.nextLine();
-        boolean condition = false;
-        while (condition == false) {
-
-//            switch (tangentbord.nextLine()) {
-//                case "0":
-//                    quitProgram();
-//                    break;
-//                case "1":
-//                    createCustomerDialog();
-//                    break;
-//                default:
-//                    invalidInputDialog();
-//                    break;
-//            }
-//            continueLoop();
-
-            try {
-                int val = Integer.parseInt(strVal);
-                if (val == 0) {
+            switch (tangentbord.nextLine()) {
+                case "0":
                     //region Avsluta
                     System.out.println("Du avslutar.");
                     System.exit(0);
                     //endregion
-                } else if (val == 1) {
+                case "1":
                     //region Skapa kund
                     createCustomer(customerList);
                     customerListToFile(customerFile, customerList);
-                    strVal = continueLoop(strVal);
+                    break;
                     //endregion
-                } else if (val == 2) {
+                case "2":
                     //region Skapa konto
                     if (customerList.size() == 0) {
                         System.out.println("Inga kunder! Vill du skapa en?\n" +
@@ -74,7 +58,7 @@ public class Main {
                         if (choice == 1) {
                             createCustomer(customerList);
                         } else if (choice == 2) {
-                            strVal = continueLoop(strVal);
+                            break;
                         }
                     }
 
@@ -101,9 +85,9 @@ public class Main {
                     System.out.println(accountName + " skapat.\n");
 
                     accountListToFile(accountFile, accountList);
-                    strVal = continueLoop(strVal);
-//endregion
-                } else if (val == 3) {
+                    break;
+                    //endregion
+                case "3":
                     //region Lista kunder
                     if (customerList.size() == 0) {
                         System.out.println("Inga kunder! Vill du skapa en?\n" +
@@ -114,27 +98,27 @@ public class Main {
                         if (choice == 1) {
                             createCustomer(customerList);
                         } else if (choice == 2) {
-                            strVal = continueLoop(strVal);
+                            break;
                         }
                     }
 
                     listCustomers(customerList);
 
-                    strVal = continueLoop(strVal);
+                    break;
                     //endregion
-                } else if (val == 4) {
+                case "4":
                     //region Sätt in pengar
                     handleMoney(accountFile, customerList, accountList, choice, chosenCustomer, accountFormat, 1);
-                    strVal = continueLoop(strVal);
+                    break;
                     //endregion
-                } else if (val == 5) {
+                case "5":
                     //region Ta ut pengar
 
                     handleMoney(accountFile, customerList, accountList, choice, chosenCustomer, accountFormat, -1);
 
-                    strVal = continueLoop(strVal);
+                    break;
                     //endregion
-                } else if (val == 6) {
+                case "6":
                     //region Lägg upp betalningsuppdrag
 
                     System.out.println("Från vilken kund? Ange index.\n");
@@ -172,9 +156,13 @@ public class Main {
 
                     String toAccount = tangentbord.nextLine();
 
-                    System.out.print("När ska överföringen ske?: ");
+                    System.out.print("När ska överföringen ske? (dd/mm/yyyy): ");
 
-                    String transactionDate = tangentbord.nextLine();
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+                    String transactionDateString = tangentbord.nextLine();
+
+                    LocalDate transactionDate = LocalDate.parse(transactionDateString, dateTimeFormatter);
 
                     transactionClass transaction = new transactionClass(customerName, fromAccount.accountName, toAccount, chosenSum, transactionDate);
 
@@ -183,11 +171,11 @@ public class Main {
                     transactionListToFile(transactionFile, transactionList);
                     accountListToFile(accountFile, accountList);
 
-                    strVal = continueLoop(strVal);
+                    break;
 
                     //endregion
-                } else if (val == 7) { //ta bort betalningsuppdrag
-
+                case "7":
+                    //region Ta bort betalningsuppdrag
                     String transactionFormat = "%-8s %-30s %-15s %-15s %-8s %-16s\n";
 
                     System.out.println("Vilket betalningsuppdrag vill du ta bort? Ange index.\n");
@@ -217,8 +205,8 @@ public class Main {
 
                     transactionList.remove(choice);
 
-
-                } else if (val == 8) { //visa kassavalv
+                    //endregion
+                case "8":
                     //region Visa kassavalv
                     int bankSum = 0;
 
@@ -228,9 +216,9 @@ public class Main {
 
                     System.out.println("Banken innehåller för tillfället: " + bankSum);
 
-                    strVal = continueLoop(strVal);
+                    break;
                     //endregion
-                } else if (val == 9) { // gör överföring mellan två konton
+                case "9":
                     //region Gör överföring
 
                     System.out.println("Från vilken kund? Ange index.\n");
@@ -254,7 +242,7 @@ public class Main {
 
                     choice = Integer.parseInt(tangentbord.nextLine());
 
-                    accountClass fromAccount = accountList.get(choice);
+                    fromAccount = accountList.get(choice);
 
                     System.out.println("Från kund: " + fromCustomer.firstName + " " + fromCustomer.lastName + "\n" +
                             "Från konto: " + fromAccount.accountName + "\nTill vilken kund? Ange index.");
@@ -278,56 +266,46 @@ public class Main {
 
                     choice = Integer.parseInt(tangentbord.nextLine());
 
-                    accountClass toAccount = accountList.get(choice);
+                    accountClass toAccountObject = accountList.get(choice);
 
                     System.out.println("Till kund: " + toCustomer.firstName + " " + toCustomer.lastName + "\n" +
-                            "Till konto: " + toAccount.accountName + "\nHur mycket vill du föra över?");
+                            "Till konto: " + toAccountObject.accountName + "\nHur mycket vill du föra över?");
 
-                    int chosenSum = Integer.parseInt(tangentbord.nextLine());
+                    chosenSum = Integer.parseInt(tangentbord.nextLine());
 
                     fromAccount.sum = fromAccount.sum - chosenSum;
-                    toAccount.sum = toAccount.sum + chosenSum;
+                    toAccountObject.sum = toAccountObject.sum + chosenSum;
 
                     System.out.println("Överföring gjord.\nSumma på " + fromAccount.accountName + ": " + fromAccount.sum + "\n" +
-                            "Summa på " + toAccount.accountName + ": " + toAccount.sum);
+                            "Summa på " + toAccountObject.accountName + ": " + toAccountObject.sum);
 
 
                     accountListToFile(accountFile, accountList);
 
-                    strVal = continueLoop(strVal);
+                    break;
 
                     //endregion
-                } else if (val < 0) {
-                    System.out.println("För lågt! Välj ett menyalternativ mellan 0-9.");
-                    strVal = tangentbord.nextLine();
-                } else if (val > 9) {
-                    System.out.println("För högt! Välj ett menyalternativ mellan 0-9.");
-                    strVal = tangentbord.nextLine();
-                }
-
-            } catch (Exception wrongInput) {
-                System.out.println("Ingen text, endast en siffra mellan 0-8.");
-                strVal = tangentbord.nextLine();
+                default:
+                    invalidInputDialog(tangentbord);
+                    break;
             }
         }
         //endregion
-        System.out.println("Ute ur loopen");
     }
 
-    private static String continueLoop(String strVal) {
-        System.out.println("\nVill du fortsätta eller avsluta?\n" +
-                "[1]Fortsätt\n" +
-                "[2]Avsluta");
+    private static void startOfProgram(File customerFile, File transactionFile, File accountFile, ArrayList<customerClass> customerList, ArrayList<transactionClass> transactionList, ArrayList<accountClass> accountList) {
+        // createFiles(customerFile, transactionFile, accountFile);
 
-        int cont = Integer.parseInt(tangentbord.nextLine());
+        filesToLists(customerFile, transactionFile, accountFile, customerList, transactionList, accountList);
 
-        if (cont == 1) {
-            printMenu();
-            strVal = tangentbord.nextLine();
-        } else if (cont == 2) {
-            System.exit(0);
-        }
-        return strVal;
+        timerJob timerjob = new timerJob(transactionList, accountList);
+        timerjob.runTimerJob();
+    }
+
+    //region Methods
+
+    private static void invalidInputDialog(Scanner tangentbord) {
+        System.out.println("Fel inmatning, skriva en siffra mellan 0-9.");
     }
 
     private static void handleMoney(File accountFile, ArrayList<customerClass> customerList,
@@ -490,7 +468,7 @@ public class Main {
                         rowPart[1],
                         rowPart[2],
                         Integer.parseInt(rowPart[3]),
-                        rowPart[4]
+                        LocalDate.parse(rowPart[4])
                 );
                 transactionList.add(transaction);
             }
@@ -560,5 +538,5 @@ public class Main {
         }
     }
 
-
+    //endregion
 }

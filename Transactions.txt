@@ -1,4 +1,1 @@
-Christoffer Stenman;Aktiekonto;Knatte;1000;Måndag
-Abdi Hussein;Sparkonto;Fnatte;300;Tisdag
-Abdi Hussein;Sparkonto;Kajsa;100;Torsdag
-Kalle Karlsson;ISK;anka;1000;torsdag
+Stefan Karlsson;Sparkonto;anka;100;2020-01-01
