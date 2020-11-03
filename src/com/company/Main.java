@@ -12,7 +12,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //ToDo Ta bort betalningsuppdrag
         //ToDo Gör om publics till privates
         //ToDo Generell formatering
         //ToDo Inmatningskontroller, kraschhantering
@@ -264,7 +263,6 @@ public class Main {
         }
         //endregion
     }
-
 
     //region Methods
 
