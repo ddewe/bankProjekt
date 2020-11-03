@@ -14,6 +14,7 @@ public class Main {
         //ToDo Gör om publics till privates
         //ToDo Generell formatering
         //ToDo Inmatningskontroller, kraschhantering
+        //ToDo Skriv om try/catches till whiles
 
         //region Initializers
         File customerFile = new File("Customers.txt");
@@ -28,7 +29,6 @@ public class Main {
         accountClass chosenAccount = null;
         int chosenSum;
         //endregion
-
 
         //Creates files, reads from files to lists.
         startOfProgram(customerFile, transactionFile, accountFile, customerList, transactionList, accountList);
@@ -76,7 +76,7 @@ public class Main {
 
                     chosenCustomer = chooseCustomer(customerList, chosenCustomer);
 
-                    createAccount(accountFile, accountList, chosenCustomer);
+                    createAccount(accountFile, customerList, accountList, chosenCustomer, accountFormat, chosenAccount);
 
                     break;
                 //endregion
@@ -122,13 +122,15 @@ public class Main {
 
                     System.out.println("Från vilket konto? Ange index.\n");
 
-                    checkForAccount(accountFile, accountList, chosenCustomer);
+                    checkForAccount(accountFile, customerList, accountList, chosenCustomer, accountFormat, chosenAccount);
 
                     listAccounts(accountList, chosenCustomer, accountFormat);
 
                     choice = Integer.parseInt(tangentbord.nextLine());
 
                     accountClass fromAccount = accountList.get(choice);
+
+                    fromAccount = validateAccountOwner(accountList, chosenCustomer, fromAccount);
 
                     System.out.print("Vilket belopp?: ");
 
@@ -251,7 +253,10 @@ public class Main {
         //endregion
     }
 
-    private static void createAccount(File accountFile, ArrayList<accountClass> accountList, customerClass chosenCustomer) {
+
+    //region Methods
+    private static void createAccount(File accountFile, ArrayList<customerClass> customerList, ArrayList<accountClass> accountList,
+                                      customerClass chosenCustomer, String accountFormat, accountClass chosenAccount) {
         String ownerName = chosenCustomer.firstName + " " + chosenCustomer.lastName;
 
         System.out.println("Vald kund: " + ownerName + "\n");
@@ -262,17 +267,32 @@ public class Main {
         int kontonr = new Random().nextInt(100000);
         String accountNumber = "9159-" + kontonr;
 
-
         accountClass ac = new accountClass(ownerName, accountName, accountNumber, chosenCustomer.ownerID, 0);
 
         accountList.add(ac);
 
         System.out.println(accountName + " skapat.\n");
 
+        System.out.println("Vill du göra en insättning?\n" +
+                "[1] Ja.\n" +
+                "[2] Nej.");
+
+        int choice = Integer.parseInt(tangentbord.nextLine());
+
+        switch (choice) {
+            case 1:
+                handleMoney(accountFile, customerList, accountList, choice, chosenCustomer, accountFormat, 1, chosenAccount);
+                break;
+            case 2:
+                break;
+            default:
+                System.out.println("Ogiltigt val, välj 1 eller 2.");
+                break;
+        }
+
         accountListToFile(accountFile, accountList);
     }
 
-    //region Methods
     private static int validateSum(accountClass fromAccount) {
         int chosenSum = Integer.parseInt(tangentbord.nextLine());
 
@@ -317,7 +337,7 @@ public class Main {
 
         chosenCustomer = chooseCustomer(customerList, chosenCustomer);
 
-        checkForAccount(accountFile, accountList, chosenCustomer);
+        checkForAccount(accountFile, customerList, accountList, chosenCustomer, accountFormat, chosenAccount);
 
         System.out.println("\nVilket konto?\n");
 
@@ -360,7 +380,8 @@ public class Main {
 
     }
 
-    private static void checkForAccount(File accountFile, ArrayList<accountClass> accountList, customerClass chosenCustomer) {
+    private static void checkForAccount(File accountFile, ArrayList<customerClass> customerList, ArrayList<accountClass> accountList,
+                                        customerClass chosenCustomer, String accountFormat, accountClass chosenAccount) {
         int choice;
         while (chosenCustomer.getAccounts(accountList).size() == 0) {
             System.out.println("Inga konton. Vill du skapa ett?\n" +
@@ -368,7 +389,7 @@ public class Main {
                     "[2] Nej, avsluta");
             choice = Integer.parseInt(tangentbord.nextLine());
             if (choice == 1) {
-                createAccount(accountFile, accountList, chosenCustomer);
+                createAccount(accountFile, customerList, accountList, chosenCustomer, accountFormat, chosenAccount);
             } else if (choice == 2) {
                 System.exit(0);
             }
