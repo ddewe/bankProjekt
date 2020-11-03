@@ -76,11 +76,9 @@ public class Main {
 
                     System.out.println("För vilken kund vill du skapa ett konto? Ange index.");
 
-                    choice = Integer.parseInt(tangentbord.nextLine());
+                    chosenCustomer = chooseCustomer(customerList, chosenCustomer);
 
-                    System.out.println("Vald kund: " + customerList.get(choice).firstName + " " + customerList.get(choice).lastName + "\n");
-
-                    chosenCustomer = customerList.get(choice);
+                    System.out.println("Vald kund: " + chosenCustomer.firstName + " " + chosenCustomer.lastName + "\n");
 
                     System.out.print("Ange namn på kontot: ");
                     String accountName = tangentbord.nextLine();
@@ -123,9 +121,7 @@ public class Main {
                 //endregion
                 case "5":
                     //region Ta ut pengar
-
                     handleMoney(accountFile, customerList, accountList, choice, chosenCustomer, accountFormat, -1, chosenAccount);
-
                     break;
                 //endregion
                 case "6":
@@ -135,9 +131,7 @@ public class Main {
 
                     listCustomers(customerList);
 
-                    choice = Integer.parseInt(tangentbord.nextLine());
-
-                    chosenCustomer = customerList.get(choice);
+                    chosenCustomer = chooseCustomer(customerList, chosenCustomer);
 
                     String customerName = chosenCustomer.firstName + " " + chosenCustomer.lastName;
 
@@ -222,34 +216,30 @@ public class Main {
 
                     listCustomers(customerList);
 
-                    choice = Integer.parseInt(tangentbord.nextLine());
-
-                    customerClass fromCustomer = customerList.get(choice);
+                    customerClass fromCustomer = chooseCustomer(customerList, chosenCustomer);
 
                     System.out.println("Från: " + fromCustomer.firstName + " " + fromCustomer.lastName + ". Från vilket konto? Ange index.\n");
 
                     listAccounts(accountList, fromCustomer, accountFormat);
 
-                    choice = Integer.parseInt(tangentbord.nextLine());
+                    fromAccount = chooseAccount(accountList, chosenAccount);
 
-                    fromAccount = accountList.get(choice);
+                    validateAccountOwner(accountList, fromCustomer, fromAccount);
 
-                    System.out.println("Från kund: " + fromCustomer.firstName + " " + fromCustomer.lastName + "\n" +
+                    System.out.println("\nFrån kund: " + fromCustomer.firstName + " " + fromCustomer.lastName + "\n" +
                             "Från konto: " + fromAccount.accountName + "\nTill vilken kund? Ange index.");
 
                     listCustomers(customerList);
 
-                    choice = Integer.parseInt(tangentbord.nextLine());
-
-                    customerClass toCustomer = customerList.get(choice);
+                    customerClass toCustomer = chooseCustomer(customerList, chosenCustomer);
 
                     System.out.println("Till: " + toCustomer.firstName + " " + toCustomer.lastName + ". Till vilket konto? Ange index.");
 
                     listAccounts(accountList, toCustomer, accountFormat);
 
-                    choice = Integer.parseInt(tangentbord.nextLine());
+                    accountClass toAccountObject = chooseAccount(accountList, chosenAccount);
 
-                    accountClass toAccountObject = accountList.get(choice);
+                    validateAccountOwner(accountList, toCustomer, toAccountObject);
 
                     System.out.println("Till kund: " + toCustomer.firstName + " " + toCustomer.lastName + "\n" +
                             "Till konto: " + toAccountObject.accountName + "\nHur mycket vill du föra över?");
@@ -261,7 +251,6 @@ public class Main {
 
                     System.out.println("Överföring gjord.\nSumma på " + fromAccount.accountName + ": " + fromAccount.sum + "\n" +
                             "Summa på " + toAccountObject.accountName + ": " + toAccountObject.sum);
-
 
                     accountListToFile(accountFile, accountList);
 
@@ -307,15 +296,7 @@ public class Main {
 
         listCustomers(customerList);
 
-        while (validChoice) {
-            try {
-                choice = Integer.parseInt(tangentbord.nextLine());
-                chosenCustomer = customerList.get(choice);
-                break;
-            } catch (Exception e) {
-                System.out.println("Felaktigt index, skriv endast siffran för index.");
-            }
-        }
+        chosenCustomer = chooseCustomer(customerList, chosenCustomer);
 
         System.out.println("\nVilket konto?\n");
 
@@ -360,6 +341,34 @@ public class Main {
 
     }
 
+    private static customerClass chooseCustomer(ArrayList<customerClass> customerList, customerClass chosenCustomer) {
+        int choice;
+        while (validChoice) {
+            try {
+                choice = Integer.parseInt(tangentbord.nextLine());
+                chosenCustomer = customerList.get(choice);
+                break;
+            } catch (Exception e) {
+                System.out.println("Felaktigt index, skriv endast siffran för index.");
+            }
+        }
+        return chosenCustomer;
+    }
+
+    private static accountClass chooseAccount(ArrayList<accountClass> accountList, accountClass chosenAccount) {
+        int choice;
+        while (validChoice) {
+            try {
+                choice = Integer.parseInt(tangentbord.nextLine());
+                chosenAccount = accountList.get(choice);
+                break;
+            } catch (Exception e) {
+                System.out.println("Felaktigt index, skriv endast siffran för index.");
+            }
+        }
+        return chosenAccount;
+    }
+
 
     private static accountClass validateAccountOwner(ArrayList<accountClass> accountList, customerClass chosenCustomer, accountClass chosenAccount) {
         int choice;
@@ -374,7 +383,6 @@ public class Main {
         }
         return chosenAccount;
     }
-
 
     private static void listAccounts(ArrayList<accountClass> accountList, customerClass chosenCustomer, String accountFormat) {
         System.out.format(accountFormat, "Index", "Kontonamn", "Saldo");
