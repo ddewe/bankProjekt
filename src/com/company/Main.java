@@ -11,7 +11,6 @@ public class Main {
     static boolean validChoice = true;
 
     public static void main(String[] args) {
-
         //ToDo Gör om publics till privates
         //ToDo Generell formatering
         //ToDo Inmatningskontroller, kraschhantering
@@ -27,7 +26,7 @@ public class Main {
         customerClass chosenCustomer = null;
         String accountFormat = "%-8s %-15s %-10s\n";
         accountClass chosenAccount = null;
-
+        int chosenSum;
         //endregion
 
 
@@ -77,21 +76,8 @@ public class Main {
 
                     chosenCustomer = chooseCustomer(customerList, chosenCustomer);
 
-                    System.out.println("Vald kund: " + chosenCustomer.firstName + " " + chosenCustomer.lastName + "\n");
+                    createAccount(accountFile, accountList, chosenCustomer);
 
-                    System.out.print("Ange namn på kontot: ");
-                    String accountName = tangentbord.nextLine();
-
-                    int kontonr = new Random().nextInt(100000);
-                    String accountNumber = "9159-" + kontonr;
-
-                    accountClass ac = new accountClass(accountName, accountNumber, chosenCustomer.ownerID, 0);
-
-                    accountList.add(ac);
-
-                    System.out.println(accountName + " skapat.\n");
-
-                    accountListToFile(accountFile, accountList);
                     break;
                 //endregion
                 case "3":
@@ -136,8 +122,9 @@ public class Main {
 
                     System.out.println("Från vilket konto? Ange index.\n");
 
-                    listAccounts(accountList, chosenCustomer, accountFormat);
+                    checkForAccount(accountFile, accountList, chosenCustomer);
 
+                    listAccounts(accountList, chosenCustomer, accountFormat);
 
                     choice = Integer.parseInt(tangentbord.nextLine());
 
@@ -145,7 +132,7 @@ public class Main {
 
                     System.out.print("Vilket belopp?: ");
 
-                    int chosenSum = getInteger(tangentbord);
+                    chosenSum = validateSum(fromAccount);
 
                     fromAccount.sum = fromAccount.sum - chosenSum;
 
@@ -243,7 +230,7 @@ public class Main {
                     System.out.println("Till kund: " + toCustomer.firstName + " " + toCustomer.lastName + "\n" +
                             "Till konto: " + toAccountObject.accountName + "\nHur mycket vill du föra över?");
 
-                    chosenSum = Integer.parseInt(tangentbord.nextLine());
+                    chosenSum = validateSum(fromAccount);
 
                     fromAccount.sum = fromAccount.sum - chosenSum;
                     toAccountObject.sum = toAccountObject.sum + chosenSum;
@@ -264,7 +251,41 @@ public class Main {
         //endregion
     }
 
+    private static void createAccount(File accountFile, ArrayList<accountClass> accountList, customerClass chosenCustomer) {
+        String ownerName = chosenCustomer.firstName + " " + chosenCustomer.lastName;
+
+        System.out.println("Vald kund: " + ownerName + "\n");
+
+        System.out.print("Ange namn på kontot: ");
+        String accountName = tangentbord.nextLine();
+
+        int kontonr = new Random().nextInt(100000);
+        String accountNumber = "9159-" + kontonr;
+
+
+        accountClass ac = new accountClass(ownerName, accountName, accountNumber, chosenCustomer.ownerID, 0);
+
+        accountList.add(ac);
+
+        System.out.println(accountName + " skapat.\n");
+
+        accountListToFile(accountFile, accountList);
+    }
+
     //region Methods
+    private static int validateSum(accountClass fromAccount) {
+        int chosenSum = Integer.parseInt(tangentbord.nextLine());
+
+        while (chosenSum > fromAccount.sum) {
+            try {
+                System.out.println("Ogiltig summa, kontrollera saldo.");
+                chosenSum = Integer.parseInt(tangentbord.nextLine());
+            } catch (Exception invalidSum) {
+
+            }
+        }
+        return chosenSum;
+    }
 
     private static void startOfProgram(File customerFile, File transactionFile, File accountFile, ArrayList<customerClass> customerList, ArrayList<transactionClass> transactionList, ArrayList<accountClass> accountList) {
         createFiles(customerFile, transactionFile, accountFile);
@@ -296,6 +317,8 @@ public class Main {
 
         chosenCustomer = chooseCustomer(customerList, chosenCustomer);
 
+        checkForAccount(accountFile, accountList, chosenCustomer);
+
         System.out.println("\nVilket konto?\n");
 
         listAccounts(accountList, chosenCustomer, accountFormat);
@@ -307,7 +330,6 @@ public class Main {
 
                 chosenAccount = validateAccountOwner(accountList, chosenCustomer, chosenAccount);
 
-
                 break;
             } catch (Exception e) {
                 System.out.println("Felaktigt index, skriv endast siffran för index.");
@@ -315,7 +337,6 @@ public class Main {
         }
 
         int chosenSum = 0;
-
 
         if (sign < 0) {
             do {
@@ -337,6 +358,21 @@ public class Main {
 
         accountListToFile(accountFile, accountList);
 
+    }
+
+    private static void checkForAccount(File accountFile, ArrayList<accountClass> accountList, customerClass chosenCustomer) {
+        int choice;
+        while (chosenCustomer.getAccounts(accountList).size() == 0) {
+            System.out.println("Inga konton. Vill du skapa ett?\n" +
+                    "[1] Ja.\n" +
+                    "[2] Nej, avsluta");
+            choice = Integer.parseInt(tangentbord.nextLine());
+            if (choice == 1) {
+                createAccount(accountFile, accountList, chosenCustomer);
+            } else if (choice == 2) {
+                System.exit(0);
+            }
+        }
     }
 
     private static customerClass chooseCustomer(ArrayList<customerClass> customerList, customerClass chosenCustomer) {
@@ -367,7 +403,6 @@ public class Main {
         return chosenAccount;
     }
 
-
     private static accountClass validateAccountOwner(ArrayList<accountClass> accountList, customerClass chosenCustomer, accountClass chosenAccount) {
         int choice;
         while (!chosenAccount.ownerID.equals(chosenCustomer.ownerID)) {
@@ -376,7 +411,7 @@ public class Main {
                 choice = Integer.parseInt(tangentbord.nextLine());
                 chosenAccount = accountList.get(choice);
             } catch (Exception accountValidation) {
-                System.out.println("Fel vid kontovalidering.");
+
             }
         }
         return chosenAccount;
@@ -399,7 +434,8 @@ public class Main {
             FileWriter accountWriter = new FileWriter(accountFile);
             for (int i = 0; i < accountList.size(); i++) {
                 accountWriter.write(
-                        accountList.get(i).accountName + ";" +
+                        accountList.get(i).ownerName + ";" +
+                                accountList.get(i).accountName + ";" +
                                 accountList.get(i).accountNumber + ";" +
                                 accountList.get(i).ownerID + ";" +
                                 accountList.get(i).sum + "\n");
@@ -456,16 +492,6 @@ public class Main {
 
     }
 
-    private static int getInteger(Scanner tangentbord) {
-        while (true) {
-            try {
-                return Integer.parseInt(tangentbord.nextLine());
-            } catch (Exception e) {
-                System.out.println("Ej ett heltal. Försök igen.");
-            }
-        }
-    }
-
     private static void filesToLists(File customerFile, File transactionFile, File accountFile, ArrayList<customerClass> customerList,
                                      ArrayList<transactionClass> transactionList, ArrayList<accountClass> accountList) {
         customerFileToList(customerFile, customerList);
@@ -483,8 +509,9 @@ public class Main {
                 accountClass account = new accountClass(
                         rowPart[0],
                         rowPart[1],
-                        (rowPart[2]),
-                        Integer.parseInt(rowPart[3]));
+                        rowPart[2],
+                        (rowPart[3]),
+                        Integer.parseInt(rowPart[4]));
                 accountList.add(account);
             }
         } catch (Exception e) {
