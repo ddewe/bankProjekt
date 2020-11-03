@@ -2,6 +2,7 @@ package com.company;
 
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -27,5 +28,16 @@ public class customerClass {
                     System.out.println("Felaktig längd. Ange 10 siffror.");
             }
         }
+    }
+
+    public ArrayList<accountClass> getAccounts(ArrayList<accountClass> accountList) {
+        ArrayList<accountClass> customerAccounts = new ArrayList<>();
+        for (int i = 0; i < accountList.size(); i++) {
+            accountClass account = accountList.get(i);
+            if (account.ownerID.equals(this.ownerID)) {
+               customerAccounts.add(account);
+            }
+        }
+        return customerAccounts;
     }
 }

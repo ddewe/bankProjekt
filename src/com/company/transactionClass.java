@@ -16,4 +16,6 @@ public class transactionClass{
         this.sum=sum;
         this.transactionDate=transactionDate;
     }
+
+
 }
