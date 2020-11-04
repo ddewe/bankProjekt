@@ -123,15 +123,13 @@ public class Main {
 
                     System.out.println("Från vilket konto? Ange index.\n");
 
-                    checkForAccount(accountFile, customerList, accountList, chosenCustomer, accountFormat, chosenAccount);
+                    checkForAccount(accountFile, customerList, accountList, chosenCustomer, accountFormat, null);
 
                     listAccounts(accountList, chosenCustomer, accountFormat);
 
-                    choice = Integer.parseInt(tangentbord.nextLine());
+                    accountClass fromAccount = chooseAccount(accountList, null);
 
-                    accountClass fromAccount = accountList.get(choice);
-
-                    fromAccount = validateAccountOwner(accountList, chosenCustomer, fromAccount);
+                    //validateAccountOwner(accountList, chosenCustomer, fromAccount);
 
                     System.out.print("Vilket belopp?: ");
 
@@ -298,13 +296,9 @@ public class Main {
         int chosenSum = Integer.parseInt(tangentbord.nextLine());
 
         while (chosenSum > fromAccount.sum) {
-            try {
                 System.out.println("Ogiltig summa, kontrollera saldo.");
                 chosenSum = Integer.parseInt(tangentbord.nextLine());
-            } catch (Exception invalidSum) {
-
             }
-        }
         return chosenSum;
     }
 
@@ -428,14 +422,10 @@ public class Main {
     private static accountClass validateAccountOwner(ArrayList<accountClass> accountList, customerClass chosenCustomer, accountClass chosenAccount) {
         int choice;
         while (!chosenAccount.ownerID.equals(chosenCustomer.ownerID)) {
-            try {
                 System.out.println("Inte ägarens konto, ange ett listat index.");
                 choice = Integer.parseInt(tangentbord.nextLine());
                 chosenAccount = accountList.get(choice);
-            } catch (Exception accountValidation) {
-
             }
-        }
         return chosenAccount;
     }
 

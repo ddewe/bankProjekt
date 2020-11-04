@@ -1,4 +1,4 @@
 Marcus dw;Sparkonto;9159-22119;1920394851;6000
 Stefan Karlsson;Sparkonto;9159-52993;3739481924;18000
-Zandra Enamn;Sparkonto;9159-87396;8245126485;0
+Zandra Enamn;Sparkonto;9159-87396;8245126485;10000
 Natalie Wahl;Sparkonto;9159-28474;9005141234;5000

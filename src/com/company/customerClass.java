@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class customerClass {
 
-    String firstName, lastName, ownerID;
+    public String firstName, lastName, ownerID;
 
     public customerClass (String firstName, String lastName, String ownerID) {
         this.firstName = firstName;
