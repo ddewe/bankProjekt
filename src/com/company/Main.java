@@ -15,6 +15,7 @@ public class Main {
         //ToDo Generell formatering
         //ToDo Inmatningskontroller, kraschhantering
         //ToDo Skriv om try/catches till whiles
+        //ToDo Betalningsuppdrag om belopp saknas prova imorgon
 
         //region Initializers
         File customerFile = new File("Customers.txt");
